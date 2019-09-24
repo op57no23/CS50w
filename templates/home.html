@@ -1,10 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-        <meta charset="UTF-8">
-        <title>Home</title>
-</head>
-<body>
-		<h1>Welcome {{user}} </h1>  
-</body>
-</html>
+{% extends 'layout.html' %}
+
+{% block title %}Book Reviews{% endblock %}
+
+{% block body %}
+<div class="container">
+		<div class="row mb-4">
+				<h1>Welcome {{user}} </h1>  
+		</div>
+		<div class="row mb-4">
+				<h2>Search for a book</h2>
+		</div>
+		<div class="row mb-4">
+				<form action = {{url_for('search')}} method = "post">
+						<div class="input-group mb-3">
+								<div class="input-group-prepend">
+										<label class = "input-group-text">Search By:</label>
+								</div>
+								<select class = "custom-select" id="searchType" name="searchType">
+										<option value="1">ISBN</option>
+										<option value="2">Title</option>
+										<option value="3">Author</option>
+								</select>
+								<input type="search" name = "query" "class="form-control">
+								<button type = "submit" class = "btn btn-outline-secondary">Search</button>
+						</div>
+				</form>
+		</div>
+		{% with message = get_flashed_messages()[0] %}
+		{% if message %}
+		<div class="row mb-4">
+				<div class="col">
+						<div class="alert alert-primary" role="alert">
+						{{message}}
+						</div>
+				</div>
+		</div>
+		{% endif %}
+		{% endwith %}
+
+		<div class="row mb-4">
+				<h2>Your reviews</h2>
+		</div>
+		<div class="row mb-4">
+		{% for review in reviews %}
+		<div class="col-md-4 mb-4">
+		Title: {{review.title}}<br>		
+		Stars: {{review.stars}}<br>
+		Review: {{review.review}}
+		</div>
+		{% endfor %}
+		</div>
+</div>
+{% endblock %}

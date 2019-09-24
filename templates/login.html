@@ -13,13 +13,13 @@
 										<h2>Login</h2>
 								</div>
 						</div>
-						<div class="row">
+						<div class="row mb-4">
 								<div class="col">
 										<form action = {{url_for('home')}} method = "post">
 												<div class="row">
 														<div class="col">
-																<label for="InputEmail1">Email address</label>
-																<input type="email" name = "email"class="form-control" id="InputEmail1" placeholder="Enter email">
+																<label for="InputEmail1">Username</label>
+																<input type="text" name = "username"class="form-control" id="InputEmail1" placeholder="Enter username">
 														</div>
 														<div class="col">
 																<label for="exampleInputPassword1">Password</label>
@@ -32,33 +32,37 @@
 										</form>
 								</div>
 						</div>
-						<div class="row mb-4">
-								<div class="col">
-										<a href="#">Forgot your password?</a>
-								</div>
-
-						</div>
 						{% if incorrect_password == True %}
 						<div class="row mb-4">
 								<div class="col">
 										<div class="alert alert-primary" role="alert">
-												Incorrect password: please try again or click forgot password
+												Incorrect password: please try again. Passwords can't be reset
 										</div>
 
 
 								</div>
 						</div>
 						{% endif %}
-						{% if user_not_registered == True %}
+						{% with message = get_flashed_messages()[0] %}
+						{% if message %}
 						<div class="row mb-4">
 								<div class="col">
 										<div class="alert alert-primary" role="alert">
-												Looks like you haven't registered. Please register.
+												{{message}}
 										</div>
 								</div>
 						</div>
 						{% endif %}
-
+						{% endwith %}
+						{% if succesful_register == True %}
+						<div class="row mb-4">
+								<div class="col">
+										<div class="alert alert-primary" role="alert">
+												Succesful Registration. Please log in.
+										</div>
+								</div>
+						</div>
+						{% endif %}
 						<div class="row">
 								<div class="col">
 										<h2>New User?
