@@ -1,14 +1,14 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<div class="container-fluid" style = "height: 100%">
-		<div class="row mb-2">
+<div class="container-fluid" style = "height: 100vh">
+		<div class="row mb-2" style = "height: 5vh">
 				<h2>Welcome to the chatroom <span id = "username">{{username}}</span>!<h2>
 		</div>
-		<div class="row mb-5">
+		<div class="row mb-5" style = "height: 5vh">
 				<h3>Select or create a channel and start chatting.</h3>
 		</div>
-		<div class="row mb-3" id = "messageWindow" style = "height: 75%;">
+		<div class="row mb-3" id = "messageWindow" style = "height: 50vh;">
 				<div class="col-2 p-2">
 						<div class="list-group" id = "listgroup">
 								{% for channel in channels.keys() %}
@@ -41,14 +41,13 @@
 				</div>
 				{% endfor %}
 		</div>
-		<div class="row" style = "height: 15%">
+		<div class="row" id = "emoji_row" style = "height: 15vh"></div>
+		<div class="row" style = "height: 5vh">
 				<div class="col-2">
 				</div>				
 				<div class="col-10" style = "display: none" id = "messageFormInput">
-						<form id = "send_message"> 
-								<input type="text" class = "form-control" id = "message_input">
-								<button type = "submit" class = "btn btn-primary" id = "send_button">Send</button>
-						</form>
+								<input type="text" class = "form-control" id = "message_input" data-emojiable= "true">
+								<button type = "button" class = "btn btn-primary" id = "send_button">Send</button>
 				</div>
 		</div>
 		<div class="modal fade" id = "Modal">

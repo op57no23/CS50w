@@ -1,7 +1,7 @@
 import os
 from collections import deque
 import pdb
-from flask import Flask, session, render_template, request, url_for, redirect
+from flask import Flask, session, render_template, request, url_for, redirect, flash, Markup
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
@@ -9,6 +9,7 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
 channels = {}
+usernames = {}
 
 @app.route("/")
 def index():
@@ -21,11 +22,12 @@ def index():
 @app.route("/chatroom", methods = ["GET", "POST"])
 def chatroom():
     if (request.method == "POST"):
-        if 'username' in session:
+        if request.form.get("username") in usernames:
             flash("This username is already in use. Please select another")
-            redirect(url_for('index'))
+            return redirect(url_for('index'))
         username = request.form.get("username")
         session['username'] = username
+        usernames[username] = True
     else:
         username = session['username']
     return render_template('chatroom.html', username = username, channels = channels)
@@ -40,7 +42,7 @@ def create_channel(data):
 def create_message(data):
     channel_name = data['channel_name']
     time = data['time']
-    message = data['message']
+    message = Markup(data['message'])
     user = session['username']
     channels[channel_name].append(Message(user, message, time))
     emit("new message", {"time": time, "user": user, "message": message, "channel_name": channel_name}, broadcast = True)
