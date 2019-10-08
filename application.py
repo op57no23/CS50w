@@ -51,3 +51,4 @@ class Message:
         self.user = user
         self.message = message
         self.time = time
+
