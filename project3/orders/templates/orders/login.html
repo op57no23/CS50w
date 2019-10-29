@@ -1,0 +1,20 @@
+{% extends "orders/base.html" %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block body %}
+
+<h1>Please login to access menu and place an order</h1>
+
+{% load crispy_forms_tags %}
+{% crispy form form.helper %}
+
+<a href="{% url 'register' %}">Haven't registered? Click here</a>
+
+{% if message %}
+<div class="alert alert-primary">{{message}}</div>
+{% endif %}
+
+{% endblock %}
