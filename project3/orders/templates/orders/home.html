@@ -2,84 +2,142 @@
 
 {% block title %}Homepage{% endblock %}
 
+{% block navbar %}
+
+<div class="collapse navbar-collapse" id="logout">
+		<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+						<a class="nav-link" href="{% url 'logout' %}">Logout<span class="sr-only">(current)</span></a>
+				</li>
+				<li class="nav-item">
+						<a class="nav-link" href="{% url 'checkout' %}">Shopping Cart <span class="badge badge-secondary">0</span></a>
+				</li>
+</div>
+
+{% endblock %}
+
 {% block body %}
 
 <ul class="list-group list-group-horizontal">
-  <li class="list-group-item" data-table = "table1">Salads</li>
-  <li class="list-group-item" data-table = "table2">Dinner Platters</li>
-  <li class="list-group-item" data-table = "table3">Pastas</li>
-  <li class="list-group-item" data-table = "table4">Pizzas</li>
-  <li class="list-group-item" data-table = "table5">Subs</li>
+		<li class="list-group-item" data-table = "table1">Salads</li>
+		<li class="list-group-item" data-table = "table2">Dinner Platters</li>
+		<li class="list-group-item" data-table = "table3">Pastas</li>
+		<li class="list-group-item" data-table = "table4">Pizzas</li>
+		<li class="list-group-item" data-table = "table5">Subs</li>
 </ul>
 
 <table id='table1' class="table" style="display: none">
-  <thead>
-    <tr>
-      <th colspan="2">Salads</th>
-    </tr>
-  </thead>
-    {% for salad in salads %}
-    <tr>
-      <td>{{salad.name}}</td>
-      <td>{{salad.price}}</td>
-      </tr>
-    {% endfor %}
+		<thead>
+				<tr>
+						<th>Salads</th>
+						<th>Price</th>
+				</tr>
+		</thead>
+		{% for salad in salads %}
+		<tr>
+				<td>{{salad.name}}</td>
+				<td><button type = "button" class = "btn btn-light" id = "{{salad.id}}">${{salad.price}}</button></td>
+		</tr>
+		{% endfor %}
 </table>
 
 <table id='table5' class="table" style="display: none">
-  <thead>
-    <tr>
-      <th colspan="2">Subs</th>
-    </tr>
-  </thead>
-{% for sub in subs %}
-<tr>
-  <td>{{sub.name}}</td>
-  <td>{{sub.price}}</td>
-<tr>
-  {% endfor %}
+		<thead>
+				<tr>
+						<th>Subs</th>
+						<th>Small</th>
+						<th>Large</th>
+				</tr>
+		</thead>
+		{% for sub in subs %}
+		<tr>
+				<td>{{sub.name}}</td>
+				<td><button type = "button" class = "btn btn-light" id = "{{sub.id}}_small">${{sub.small_price}}</button></td>
+				<td><button type = "button" class = "btn btn-light" id = "{{sub.id}}_large">${{sub.large_price}}</button></td>
+				<tr>
+						{% endfor %}
 </table >
 
 <table id='table2' class="table" style="display: none">
-  <thead>
-    <tr>
-      <th colspan="2">Platters</th>
-    </tr>
-  </thead>
-    {% for platter in dp %}
-    <tr>
-      <td>{{platter.name}}</td>
-      <td>{{platter.price}}</td>
-    </tr>
-    {% endfor %}
+		<thead>
+				<tr>
+						<th>Platters</th>
+						<th>Small</th>
+						<th>Large</th>
+				</tr>
+		</thead>
+		{% for platter in dp %}
+		<tr>
+				<td>{{platter.name}}</td>
+				<td><button type = "button" class = "btn btn-light" id = "{{platter.id}}_small">${{platter.small_price}}</button></td>
+				<td><button type = "button" class = "btn btn-light" id = "{{platter.id}}_large">${{platter.large_price}}</button></td>
+		</tr>
+		{% endfor %}
 </table>
 
 <table id='table3' class="table" style="display: none">
-  <thead>
-    <tr>
-      <th colspan="2">Pastas</th>
-    </tr>
-  </thead>
-    {% for pasta in pastas %}
-    <tr>
-      <td>{{pasta.name}}</td>
-      <td>{{pasta.price}}</td>
-    </tr>
-    {% endfor %}
+		<thead>
+				<tr>
+						<th>Pastas</th>
+						<th>Price</th>
+				</tr>
+		</thead>
+		{% for pasta in pastas %}
+		<tr>
+				<td>{{pasta.name}}</td>
+				<td><button type = "button" class = "btn btn-light" id = "{{pasta.id}}">${{pasta.price}}</button></td>
+		</tr>
+		{% endfor %}
 </table>
 
 <table id='table4' class="table" style="display: none">
-  <thead>
-    <tr>
-      <th colspan="2">Pizzas</th>
-    </tr>
-  </thead>
-    {% for pizza in pizzas %}
-    <tr>
-      <td>{{pizza.name}}</td>
-      <td>{{pizza.price}}</td>
-    </tr>
-    {% endfor %}
+		<thead>
+				<tr>
+						<th>Pizzas</th>
+						<th>Small</th>
+						<th>Large</th>
+				</tr>
+		</thead>
+		<tbody>
+				{% for pizza in pizzas %}
+				<tr>
+						<td>{{pizza.name}}</td>
+						<td><button data-toppings = "{{pizza.name}}" data-url = {% url 'pizza_form' %} type = "button" class = "btn btn-light" id = "{{pizza.id}}_small" data-toggle="modal" data-target="#PizzaModal">${{pizza.small_price}}</button></td>
+						<td><button type = "button" class = "btn btn-light" id = "{{pizza.id}}_large" data-toggle="modal" data-target="#PizzaModal">${{pizza.large_price}}</button></td>
+				</tr>
+				{% endfor %}
+				<tr>
+						<th>Sicilian Pizzas</th>
+						<th>Small</th>
+						<th>Large</th>
+				</tr>
+				{% for pizza in sicilian %}
+				<tr>
+						<td>{{pizza.name}}</td>
+						<td><button type = "button" class = "btn btn-light" data-item = "sicilian{{pizza.name}}_small">${{pizza.small_price}}</button></td>
+						<td><button type = "button" class = "btn btn-light" data-item = "sicilian{{pizza.name}}_large">${{pizza.large_price}}</button></td>
+				</tr>
+				{% endfor %}
+		</tbody>
 </table>
 
+<!-- Modal -->
+<div class="modal fade" id="PizzaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+			  <h5 class="modal-title" id="exampleModalLabel">Pizza</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Add to cart</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

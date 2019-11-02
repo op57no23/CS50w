@@ -1,9 +1,9 @@
 from django.db import models
 
 class MenuItem(models.Model):
-    price = models.FloatField()
+    price = models.FloatField(null = True, blank = True)
     name = models.CharField(max_length=50)
-    
+
     def __str__(self):
         return self.name
 
@@ -30,16 +30,15 @@ class Order(models.Model):
         return output
 
 class Pizza(MenuItem):
-    sizes = (('S', "Small"), ("L", "Large"))
-    size = models.CharField(max_length=5, choices = sizes)
-    special = models.BooleanField()
-    sicilian = models.BooleanField()
+    sicilian = models.BooleanField(default = False)
+    small_price = models.FloatField(default = 10)
+    large_price = models.FloatField(default = 10)
+
+class SicilianPizza(Pizza):
+    sicilian = True
 
     def __str__(self):
-        sicilian_string = ""
-        if (self.sicilian):
-            sicilian_string = "sicilian"
-        return "%s %s -- %s" % (self.name, sicilian_string, self.size)
+        return "Sicilian " + self.name
 
 class PizzaOrder(Pizza):
     topps = models.ManyToManyField(Topping)
@@ -52,15 +51,13 @@ class PizzaOrder(Pizza):
         sicilian_string = ""
         if (self.sicilian):
             sicilian_string = "sicilian"
-        return ("%s %s %s with toppings: %s" % (self.size, self.name, sicilian_string, topping_string))
+        return ("%s %s with toppings: %s" % (self.name, sicilian_string, topping_string))
 
 
 class Sub(MenuItem):
-    sizes = (('S', "Small"), ("L", "Large"))
-    size = models.CharField(max_length=5, choices = sizes)
+    small_price = models.FloatField(null = True, blank = True, default = 6.50)
+    large_price = models.FloatField(default = 7.95)
 
-    def __str__(self):
-        return "%s -- %s" % (self.name, self.size) 
 
 class SubOrder(Sub):
     extras = models.ManyToManyField(Extra)
@@ -69,23 +66,15 @@ class SubOrder(Sub):
         extra_string = ""
         for extra in self.extras.all():
             extra_string += str(extra) + ", "
-        return "%s %s. Extras: %s" % (self.size, self.name, extra_string) 
+        return "%s. Extras: %s" % (self.name, extra_string)
 
 
 class Pasta(MenuItem):
-    
-    def __str__(self):
-        return self.name
-
+    pass
 
 class Salad(MenuItem):
-    
-     def __str__(self):
-        return self.name
+    pass
 
 class Dinner_Platter(MenuItem):
-    sizes = (('S', "Small"), ("L", "Large"))
-    size = models.CharField(max_length=5, choices = sizes)
-
-    def __str__(self):
-        return "%s -- %s" % (self.name, self.size)
+    small_price = models.FloatField(default = 10)
+    large_price = models.FloatField(default = 10)

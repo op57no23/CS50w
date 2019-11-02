@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Pizza, Topping, Sub, Extra, Salad, Pasta, Dinner_Platter, Order, PizzaOrder, SubOrder
+from .models import Pizza, Topping, Sub, Extra, Salad, Pasta, Dinner_Platter, Order, PizzaOrder, SubOrder, SicilianPizza
 
 admin.site.register(Pizza)
 admin.site.register(Topping)
@@ -12,3 +12,4 @@ admin.site.register(Dinner_Platter)
 admin.site.register(Order)
 admin.site.register(PizzaOrder)
 admin.site.register(SubOrder)
+admin.site.register(SicilianPizza)

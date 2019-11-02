@@ -3,8 +3,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
+from django.template import RequestContext
+from crispy_forms.utils import render_crispy_form
 from .models import *
-from .forms import LoginForm, RegistrationForm
+from .forms import LoginForm, RegistrationForm, PizzaModal
+import pdb
 
 def index(request):
     if not request.user.is_authenticated:
@@ -13,14 +16,15 @@ def index(request):
     dinner_Platters = Dinner_Platter.objects.all()
     subs = Sub.objects.all()
     pastas = Pasta.objects.all()
-    pizzas = Pizza.objects.all()
-
+    pizzas = Pizza.objects.filter(sicilian = False)
+    sicilian = SicilianPizza.objects.all()
     context = {
         'salads': salads,
         'dp': dinner_Platters,
         'subs': subs,
         'pastas': pastas,
         'pizzas': pizzas,
+        'sicilian': sicilian,
         "user": request.user
             }
     return render(request, "orders/home.html", context)
@@ -61,3 +65,20 @@ def registration_view(request):
             return HttpResponseRedirect(reverse('index'))
         return render(request, "orders/register.html", {'form': form})
     return render(request, "orders/register.html", {'form': RegistrationForm()})
+
+def checkout_view(request):
+    pass
+    """
+    cart = request.session.get('cart', False)
+
+    if (cart)
+        return render(request, "orders/checkout.html", {'cart': cart})
+    """
+
+def pizza_form(request):
+    if request.method == "GET":
+        topping_number = request.GET.get("toppings")
+        request_context = RequestContext(request)
+        pdb.set_trace()
+        return render_crispy_form(PizzaModal(topping_number = topping_number), context = request_context)
+
