@@ -10,7 +10,7 @@
 						<a class="nav-link" href="{% url 'logout' %}">Logout<span class="sr-only">(current)</span></a>
 				</li>
 				<li class="nav-item">
-						<a class="nav-link" href="{% url 'checkout' %}">Shopping Cart <span class="badge badge-secondary">0</span></a>
+						<a class="nav-link" id = "shopping_cart" href="#">Shopping Cart <span class="badge badge-secondary">0</span></a>
 				</li>
 </div>
 
@@ -19,24 +19,24 @@
 {% block body %}
 
 <ul class="list-group list-group-horizontal">
-		<li class="list-group-item" data-table = "table1">Salads</li>
-		<li class="list-group-item" data-table = "table2">Dinner Platters</li>
-		<li class="list-group-item" data-table = "table3">Pastas</li>
-		<li class="list-group-item" data-table = "table4">Pizzas</li>
-		<li class="list-group-item" data-table = "table5">Subs</li>
+		<li class="list-group-item" data-table = "table1">Salad</li>
+		<li class="list-group-item" data-table = "table2">Dinner Platter</li>
+		<li class="list-group-item" data-table = "table3">Pasta</li>
+		<li class="list-group-item" data-table = "table4">Pizza</li>
+		<li class="list-group-item" data-table = "table5">Sub</li>
 </ul>
 
 <table id='table1' class="table" style="display: none">
 		<thead>
 				<tr>
-						<th>Salads</th>
+						<th>Salad</th>
 						<th>Price</th>
 				</tr>
 		</thead>
 		{% for salad in salads %}
 		<tr>
 				<td>{{salad.name}}</td>
-				<td><button type = "button" class = "btn btn-light" id = "{{salad.id}}">${{salad.price}}</button></td>
+				<td><button data-toggle="modal" data-target="#Modal" data-name = "{{salad.name}}" data-url = "{% url 'modal_form' %}" type = "button" class = "btn btn-light" id = "{{salad.id}}">${{salad.price|floatformat:2}}</button></td>
 		</tr>
 		{% endfor %}
 </table>
@@ -44,7 +44,7 @@
 <table id='table5' class="table" style="display: none">
 		<thead>
 				<tr>
-						<th>Subs</th>
+						<th>Sub</th>
 						<th>Small</th>
 						<th>Large</th>
 				</tr>
@@ -52,8 +52,8 @@
 		{% for sub in subs %}
 		<tr>
 				<td>{{sub.name}}</td>
-				<td><button type = "button" class = "btn btn-light" id = "{{sub.id}}_small">${{sub.small_price}}</button></td>
-				<td><button type = "button" class = "btn btn-light" id = "{{sub.id}}_large">${{sub.large_price}}</button></td>
+				<td><button data-toggle="modal" data-target="#Modal" data-name = "{{sub.name}}" data-url = "{% url 'modal_form' %}" type = "button" class = "btn btn-light" id = "{{sub.id}}_small">${{sub.small_price|floatformat:2}}</button></td>
+				<td><button data-toggle="modal" data-target="#Modal" data-name = "{{sub.name}}" data-url = "{% url 'modal_form' %}" type = "button" class = "btn btn-light" id = "{{sub.id}}_large">${{sub.large_price|floatformat:2}}</button></td>
 				<tr>
 						{% endfor %}
 </table >
@@ -61,7 +61,7 @@
 <table id='table2' class="table" style="display: none">
 		<thead>
 				<tr>
-						<th>Platters</th>
+						<th>Platter</th>
 						<th>Small</th>
 						<th>Large</th>
 				</tr>
@@ -69,8 +69,8 @@
 		{% for platter in dp %}
 		<tr>
 				<td>{{platter.name}}</td>
-				<td><button type = "button" class = "btn btn-light" id = "{{platter.id}}_small">${{platter.small_price}}</button></td>
-				<td><button type = "button" class = "btn btn-light" id = "{{platter.id}}_large">${{platter.large_price}}</button></td>
+				<td><button data-toggle="modal" data-target="#Modal" data-name = "{{platter.name}}" data-url = "{% url 'modal_form' %}" type = "button" class = "btn btn-light" id = "{{platter.id}}_small">${{platter.small_price|floatformat:2}}</button></td>
+				<td><button data-toggle="modal" data-target="#Modal" data-name = "{{platter.name}}" data-url = "{% url 'modal_form' %}" type = "button" class = "btn btn-light" id = "{{platter.id}}_large">${{platter.large_price|floatformat:2}}</button></td>
 		</tr>
 		{% endfor %}
 </table>
@@ -78,14 +78,14 @@
 <table id='table3' class="table" style="display: none">
 		<thead>
 				<tr>
-						<th>Pastas</th>
+						<th>Pasta</th>
 						<th>Price</th>
 				</tr>
 		</thead>
 		{% for pasta in pastas %}
 		<tr>
 				<td>{{pasta.name}}</td>
-				<td><button type = "button" class = "btn btn-light" id = "{{pasta.id}}">${{pasta.price}}</button></td>
+				<td><button data-name = "{{pasta.name}}" data-url = "{% url 'modal_form' %}" data-toggle="modal" data-target="#Modal" type = "button" class = "btn btn-light" id = "{{pasta.id}}">${{pasta.price|floatformat:2}}</button></td>
 		</tr>
 		{% endfor %}
 </table>
@@ -93,7 +93,7 @@
 <table id='table4' class="table" style="display: none">
 		<thead>
 				<tr>
-						<th>Pizzas</th>
+						<th>Pizza</th>
 						<th>Small</th>
 						<th>Large</th>
 				</tr>
@@ -102,8 +102,8 @@
 				{% for pizza in pizzas %}
 				<tr>
 						<td>{{pizza.name}}</td>
-						<td><button data-toppings = "{{pizza.name}}" data-url = {% url 'pizza_form' %} type = "button" class = "btn btn-light" id = "{{pizza.id}}_small" data-toggle="modal" data-target="#PizzaModal">${{pizza.small_price}}</button></td>
-						<td><button type = "button" class = "btn btn-light" id = "{{pizza.id}}_large" data-toggle="modal" data-target="#PizzaModal">${{pizza.large_price}}</button></td>
+						<td><button data-name = "{{pizza.name}}" data-url = "{% url 'modal_form' %}" type = "button" class = "btn btn-light" id = "{{pizza.id}}_small" data-toggle="modal" data-target="#Modal">${{pizza.small_price|floatformat:2}}</button></td>
+						<td><button  data-name = "{{pizza.name}}" data-url = "{% url 'modal_form' %}" type = "button" class = "btn btn-light" id = "{{pizza.id}}_large" data-toggle="modal" data-target="#Modal">${{pizza.large_price|floatformat:2}}</button></td>
 				</tr>
 				{% endfor %}
 				<tr>
@@ -114,30 +114,21 @@
 				{% for pizza in sicilian %}
 				<tr>
 						<td>{{pizza.name}}</td>
-						<td><button type = "button" class = "btn btn-light" data-item = "sicilian{{pizza.name}}_small">${{pizza.small_price}}</button></td>
-						<td><button type = "button" class = "btn btn-light" data-item = "sicilian{{pizza.name}}_large">${{pizza.large_price}}</button></td>
+						<td><button data-name = "{{pizza.name}}: Sicilian" data-url = "{% url 'modal_form' %}" type = "button" class = "btn btn-light" id = "{{pizza.id}}_small" data-toggle="modal" data-target="#Modal">${{pizza.small_price|floatformat:2}}</button></td>
+						<td><button data-name = "{{pizza.name}}: Sicilian" data-url = "{% url 'modal_form' %}" type = "button" class = "btn btn-light" id = "{{pizza.id}}_large" data-toggle="modal" data-target="#Modal">${{pizza.large_price|floatformat:2}}</button></td>
 				</tr>
 				{% endfor %}
 		</tbody>
 </table>
 
 <!-- Modal -->
-<div class="modal fade" id="PizzaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-			  <h5 class="modal-title" id="exampleModalLabel">Pizza</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Add to cart</button>
-      </div>
-    </div>
-  </div>
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+		</div>
 </div>
+{% endblock %}
+
+{% block javascript %}
+{% load static %}
+<script src="{% static 'orders/home.js' %}"></script>
 {% endblock %}
