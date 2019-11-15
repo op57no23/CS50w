@@ -30,10 +30,10 @@ $.ajaxSetup({
 $(document).ready(function() {
 		$('button[id="53_small"]').remove();
 		if (window.localStorage.getItem('cart_length')) {
-				$("a > span.badge").html(window.localStorage.getItem('cart_length'));
+				$("button > span.badge").html(window.localStorage.getItem('cart_length'));
 		}
 		else {
-				$("a > span.badge").html(0);
+				$("button > span.badge").html(0);
 		}
 		$(".list-group-item").click(function() {
 				$("#" + $(".list-group-item.active").attr("data-table")).attr("style", "display: none");
@@ -70,7 +70,7 @@ $(document).ready(function() {
 								}
 								else {
 										$('#Modal').modal('hide');
-										let shop_count = $("a > span.badge").html();
+										let shop_count = $("button > span.badge").html();
 										var re = /quantity=(\d*)/;
 										var quant = parseInt(re.exec(formdata)[1]);
 										window.localStorage.setItem('cart_length', parseInt(shop_count) + quant);
@@ -80,24 +80,21 @@ $(document).ready(function() {
 										var cart = JSON.parse(window.localStorage['cart']);
 										cart.push(JSON.parse(data['valid_form']));
 										window.localStorage.setItem('cart', JSON.stringify(cart));
-										$("a > span.badge").html(parseInt(shop_count) + quant);
+										$("button  > span.badge").html(parseInt(shop_count) + quant);
+										$("#cart_input").attr('value', JSON.stringify(window.localStorage));
+										$('#cart_length_input').attr('value', $('button > span.badge').html());
 								}
 						}
 				});
 		});
 		$('.nav-link#shopping_cart').on('click', function() {
-				console.log("I got clicked");
-				if (parseInt($("a > span.badge").html()) === 0) {
+				if (parseInt($("button > span.badge").html()) === 0) {
 						$('.navbar').after("<div class='alert alert-warning alert-dismissible fade show' role='alert'>There isn't anything in your shopping cart.<button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button></div>");
 				}
-				else {
-						$.ajax({
-								method: "POST",
-								url: "checkout",
-								data: JSON.stringify(window.localStorage)
-						});
-				}
 		});
+
 		$('.list-group-item[data-table="table4"]').click();
 
 });
+
+

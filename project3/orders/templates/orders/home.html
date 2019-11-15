@@ -10,7 +10,12 @@
 						<a class="nav-link" href="{% url 'logout' %}">Logout<span class="sr-only">(current)</span></a>
 				</li>
 				<li class="nav-item">
-						<a class="nav-link" id = "shopping_cart" href="#">Shopping Cart <span class="badge badge-secondary">0</span></a>
+						<form action="{% url 'checkout' %}" method = "post">
+								{% csrf_token %}
+								<input type="hidden" name = "cart" id = 'cart_input'>
+								<input type="hidden" name = "cart_length" id = 'cart_length_input'>
+								<button type = "submit" class="btn btn-link nav-link" id = "shopping_cart" href="">Shopping Cart <span class="badge badge-secondary">0</span></button>
+						</form>
 				</li>
 </div>
 

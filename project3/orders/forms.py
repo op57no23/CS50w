@@ -53,6 +53,7 @@ class PizzaModal(forms.Form):
         toppings = self['toppings'].value()
         if (len(toppings) != int(self['topping_number'].value())):
             raise forms.ValidationError('Incorrect number of toppings', code = 'topping_incorrect')
+        return self.cleaned_data['toppings']
 
     topping_number = forms.IntegerField(min_value = 0, max_value = 3, widget = forms.HiddenInput())
     size = forms.ChoiceField(choices = [('small', 'small'), ('large', 'large')], widget = forms.HiddenInput())

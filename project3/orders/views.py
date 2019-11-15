@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.template.context_processors import csrf
 from crispy_forms.utils import render_crispy_form
-from .models import *
+from .models import MenuItem, OrderItem, Order, Extra, Topping
 from .forms import LoginForm, RegistrationForm, PizzaModal, SubModal, Modal
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 import pdb
@@ -16,19 +16,25 @@ import json
 def index(request):
     if not request.user.is_authenticated:
         return render(request, "orders/login.html", {'form': LoginForm()})
-    salads = Salad.objects.all()
-    dinner_Platters = Dinner_Platter.objects.all()
-    subs = Sub.objects.all()
-    pastas = Pasta.objects.all()
-    pizzas = Pizza.objects.filter(sicilian = False)
-    sicilian = SicilianPizza.objects.all()
+    pdb.set_trace()
+    try:
+        order = Order.objects.filter(user = request.user.id)[0]
+    except:
+        order = ""
+    salads = MenuItem.objects.filter(type = 'Salad')
+    dinner_Platters = MenuItem.objects.filter(type = 'DP')
+    subs = MenuItem.objects.filter(type = 'Sub')
+    pastas = MenuItem.objects.filter(type = 'Pasta')
+    pizzas = MenuItem.objects.filter(type = 'Pizza')
+    sicilian = MenuItem.objects.filter(type = 'SP')
     context = {
-        'salads': salads,
-        'dp': dinner_Platters,
-        'subs': subs,
-        'pastas': pastas,
-        'pizzas': pizzas,
-        'sicilian': sicilian,
+            'order': order,
+            'salads': salads,
+            'dp': dinner_Platters,
+            'subs': subs,
+            'pastas': pastas,
+            'pizzas': pizzas,
+            'sicilian': sicilian,
             }
     return render(request, "orders/home.html", context)
 
@@ -71,8 +77,54 @@ def registration_view(request):
     return render(request, "orders/register.html", {'form': RegistrationForm()})
 
 def checkout_view(request):
-    pdb.set_trace()
-    return render(request, "orders/checkout.html", {'cart': cart})
+    cart = json.loads(json.loads(request.POST['cart'])['cart'])
+    if (Order.objects.filter(user = User.objects.get(pk=request.user.id), completed = False)):
+        order = Order.objects.filter(user = User.objects.get(pk=request.user.id), checked_out = False))[0]
+    else:
+        order = Order(user = Users.objects.get(pk = request.user.id))
+        order.save()
+    total = 0
+    items = []
+    for item in cart:
+        currentItem = {}
+        if 'toppings' in item:
+            orderItem = OrderItem(price = 0, menuItem = MenuItem.objects.get(pk = item['id']), quantity = item['quantity'], size = item['size'])
+            orderItem.save()
+            for topping in item['toppings']:
+                orderItem.toppings.add(Topping.objects.get(pk = int(topping)))
+            currentItem['additionals'] = orderItem.toppings.all()
+        elif 'extras' in item:
+            orderItem = OrderItem(price = 0, menuItem = MenuItem.objects.get(pk = item['id']), quantity = item['quantity'], size = item['size'])
+            orderItem.save()
+            for extra in item['extras']:
+                orderItem.extras.add(Extra.objects.get(pk = int(extra)))
+                orderItem.price += .50
+                total += .50
+            currentItem['additionals'] = orderItem.extras.all()
+        else:
+           orderItem = OrderItem(price = 0, menuItem = MenuItem.objects.get(pk = item['id']), quantity = item['quantity'], size = item['size'])
+           orderItem.save()
+           currentItem['additionals'] = []
+        order.items.add(orderItem)
+        if item['size'] == 'small':
+            total += orderItem.menuItem.small_price * item['quantity']
+            orderItem.price += orderItem.menuItem.small_price
+            orderItem.save()
+        elif item['size'] == 'large':
+            total += orderItem.menuItem.large_price * item['quantity']
+            orderItem.price += orderItem.menuItem.large_price
+            orderItem.save()
+        else:
+            total += orderItem.menuItem.price * item['quantity']
+            orderItem.price += orderItem.menuItem.price
+            orderItem.save()
+        currentItem['name'] = orderItem.menuItem.get_type_display() + ": " + orderItem.menuItem.name
+        currentItem['size'] = orderItem.size
+        currentItem['quantity'] = orderItem.quantity
+        currentItem['price'] = orderItem.price * orderItem.quantity
+        currentItem['id'] = orderItem.id
+        items.append(currentItem)
+    return render(request, "orders/checkout.html", {'items': items, 'total': total})
 
 def modal_form(request):
     if request.method == "POST":

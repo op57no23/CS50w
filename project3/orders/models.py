@@ -1,11 +1,15 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class MenuItem(models.Model):
-    price = models.FloatField(null = True, blank = True)
+    type = models.CharField(max_length=50, choices = [('Pizza', "Pizza"), ('SP', "Sicilian Pizza"), ('Salad', 'Salad'), ('Pasta', 'Pasta'), ('DP', 'Dinner Platter'), ('Sub', 'Sub')], default = 'Sub')
+    price = models.FloatField(blank = True, null = True)
     name = models.CharField(max_length=50)
-
+    small_price = models.FloatField(blank = True, null = True)
+    large_price = models.FloatField(blank = True, null = True)
+    
     def __str__(self):
-        return self.name
+        return f"{self.type}: {self.name}"
 
 class Topping(models.Model):
     name = models.CharField(max_length=50)
@@ -20,8 +24,31 @@ class Extra(models.Model):
     def __str__(self):
         return self.name
 
+class OrderItem(models.Model):
+    menuItem = models.ForeignKey(MenuItem, on_delete = models.CASCADE)
+    size = models.CharField(max_length=50, choices = [('none', 'none'), ('SM', 'small'), ('LG', 'large')])
+    toppings = models.ManyToManyField(Topping)
+    extras = models.ManyToManyField(Extra)
+    quantity = models.IntegerField()
+    price = models.FloatField(null = True)
+
+    def __str__(self):
+        if (self.size in [2, 3]):
+            if (self.toppings):
+                return f"{self.menuItem.get_type_display()}: {self.get_size_display()} {self.menuItem.name} with {self.toppings}"
+            elif (self.extras):
+                return f"{self.menuItem.get_type_display()}: {self.get_size_display()} {self.menuItem.name} with {self.extras}"
+            else:
+                return f"{self.menuItem.get_type_display()}: {self.get_size_display()} {self.menuItem.name}"
+        else:
+                return f"{self.menuItem.get_type_display()}: {self.menuItem.name}"
+
+
 class Order(models.Model):
-    items = models.ManyToManyField(MenuItem)
+    user = models.ForeignKey(User, on_delete = models.CASCADE, default = 2, null = True) 
+    items = models.ManyToManyField(OrderItem)
+    completed = models.BooleanField(default = False)
+    checked_out = models.BooleanField(default = False)
 
     def __str__(self):
         output = ""
@@ -29,52 +56,4 @@ class Order(models.Model):
             output += str(item) + "\n"
         return output
 
-class Pizza(MenuItem):
-    sicilian = models.BooleanField(default = False)
-    small_price = models.FloatField(default = 10)
-    large_price = models.FloatField(default = 10)
 
-class SicilianPizza(Pizza):
-    sicilian = True
-
-    def __str__(self):
-        return "Sicilian " + self.name
-
-class PizzaOrder(Pizza):
-    topps = models.ManyToManyField(Topping)
-
-    def __str__(self):
-        topping_string = ""
-        for topp in self.topps.all():
-            topping_string += str(topp) + " "
-
-        sicilian_string = ""
-        if (self.sicilian):
-            sicilian_string = "sicilian"
-        return ("%s %s with toppings: %s" % (self.name, sicilian_string, topping_string))
-
-
-class Sub(MenuItem):
-    small_price = models.FloatField(null = True, blank = True, default = 6.50)
-    large_price = models.FloatField(default = 7.95)
-
-
-class SubOrder(Sub):
-    extras = models.ManyToManyField(Extra)
-
-    def __str__(self):
-        extra_string = ""
-        for extra in self.extras.all():
-            extra_string += str(extra) + ", "
-        return "%s. Extras: %s" % (self.name, extra_string)
-
-
-class Pasta(MenuItem):
-    pass
-
-class Salad(MenuItem):
-    pass
-
-class Dinner_Platter(MenuItem):
-    small_price = models.FloatField(default = 10)
-    large_price = models.FloatField(default = 10)
