@@ -4,7 +4,7 @@
 
 {% block navbar %}
 
-<div class="collapse navbar-collapse" id="logout">
+<div class="collapse navbar-collapse" id="navbar">
 		<ul class="navbar-nav mr-auto">
 				<li class="nav-item">
 						<a class="nav-link" href="{% url 'logout' %}">Logout<span class="sr-only">(current)</span></a>
@@ -17,47 +17,58 @@
 {% endblock %}
 
 {% block body %}
+<div class="row">
 
-<table class="table">
-		<thead>
-				<tr>
-						<th class = "text-center"></th>
-						<th class = "text-center">Item</th>
-						<th class = "text-center">Size (if applicable)</th>
-						<th class = "text-center">Quantity</th>
-						<th class = "text-center">Toppings or Extras</th>
-						<th class = "text-center">Price</th>
-				</tr>
-		</thead>
-		<tbody>
-				{% for item in items %}
-				<tr>
-						<td class = "text-center"><button type="button" class="btn btn-light" id = {{item.id}}>&times</button></td>
-						<td class = "text-center">{{item.name}}</td>
-						<td class = "text-center">{{item.size|title}}</td>
-						<td class = "text-center">{{item.quantity}}</td>
-						<td class = "text-center">
-								{% for additional in item.additionals %}
-								{{additional.name}}<br>
-								{% endfor %}
-						</td>
-						<td class = "text-center">${{item.price|floatformat:2}}</td>
-				</tr>
-				{% endfor %}
+		<table class="table">
+				<thead>
+						<tr>
+								<th class = "text-center"></th>
+								<th class = "text-center">Item</th>
+								<th class = "text-center">Size (if applicable)</th>
+								<th class = "text-center">Quantity</th>
+								<th class = "text-center">Toppings or Extras</th>
+								<th class = "text-center">Price</th>
+						</tr>
+				</thead>
+				<tbody>
+						{% for item in items %}
+						<tr>
+								<td class = "text-center"><button type="button" class="btn btn-light" id = {{item.id}}>&times</button></td>
+								<td class = "text-center">{{item.name}}</td>
+								<td class = "text-center">{{item.size|title}}</td>
+								<td class = "text-center">{{item.quantity}}</td>
+								<td class = "text-center">
+										{% for additional in item.additionals %}
+										{{additional.name}}<br>
+										{% endfor %}
+								</td>
+								<td class = "text-center item-price">${{item.price|floatformat:2}}</td>
+						</tr>
+						{% endfor %}
 
-		</tbody>
-		<tfoot>
-				<tr>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td>Total: ${{total|floatformat:2}}</td>
-				</tr>
-		</tfoot>
-</table>
+				</tbody>
+				<tfoot>
+						<tr>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td class = "text-center" id = 'total'>Total: ${{total|floatformat:2}}</td>
+						</tr>
+				</tfoot>
+		</table>
+
+</div>
+<div class="row">
+		<div class="col-10"></div>
+		<div class="col-2">
+				<button class = "btn btn-primary" id = 'place_order'>Place your order</button>
+		</div>
+</div>
 {% endblock %}
 
 {% block javascript %}
+{% load static %}
+<script src="{% static 'orders/checkout.js' %}"></script>
 {% endblock %}

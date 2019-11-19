@@ -8,6 +8,7 @@ from crispy_forms.utils import render_crispy_form
 from .models import MenuItem, OrderItem, Order, Extra, Topping
 from .forms import LoginForm, RegistrationForm, PizzaModal, SubModal, Modal
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.contrib.auth.decorators import login_required, user_passes_test
 import pdb
 import re
 import json
@@ -16,11 +17,10 @@ import json
 def index(request):
     if not request.user.is_authenticated:
         return render(request, "orders/login.html", {'form': LoginForm()})
-    pdb.set_trace()
     try:
-        order = Order.objects.filter(user = request.user.id)[0]
+        order_length = len(Order.objects.get(user = User.objects.get(pk = request.user.id), checked_out = False).items.all())
     except:
-        order = ""
+        order_length = 0
     salads = MenuItem.objects.filter(type = 'Salad')
     dinner_Platters = MenuItem.objects.filter(type = 'DP')
     subs = MenuItem.objects.filter(type = 'Sub')
@@ -28,7 +28,7 @@ def index(request):
     pizzas = MenuItem.objects.filter(type = 'Pizza')
     sicilian = MenuItem.objects.filter(type = 'SP')
     context = {
-            'order': order,
+            'order_length': order_length,
             'salads': salads,
             'dp': dinner_Platters,
             'subs': subs,
@@ -76,55 +76,32 @@ def registration_view(request):
         return render(request, "orders/register.html", {'form': form})
     return render(request, "orders/register.html", {'form': RegistrationForm()})
 
+@login_required(login_url='login')
 def checkout_view(request):
-    cart = json.loads(json.loads(request.POST['cart'])['cart'])
-    if (Order.objects.filter(user = User.objects.get(pk=request.user.id), completed = False)):
-        order = Order.objects.filter(user = User.objects.get(pk=request.user.id), checked_out = False))[0]
-    else:
-        order = Order(user = Users.objects.get(pk = request.user.id))
-        order.save()
     total = 0
     items = []
-    for item in cart:
-        currentItem = {}
-        if 'toppings' in item:
-            orderItem = OrderItem(price = 0, menuItem = MenuItem.objects.get(pk = item['id']), quantity = item['quantity'], size = item['size'])
-            orderItem.save()
-            for topping in item['toppings']:
-                orderItem.toppings.add(Topping.objects.get(pk = int(topping)))
-            currentItem['additionals'] = orderItem.toppings.all()
-        elif 'extras' in item:
-            orderItem = OrderItem(price = 0, menuItem = MenuItem.objects.get(pk = item['id']), quantity = item['quantity'], size = item['size'])
-            orderItem.save()
-            for extra in item['extras']:
-                orderItem.extras.add(Extra.objects.get(pk = int(extra)))
-                orderItem.price += .50
-                total += .50
-            currentItem['additionals'] = orderItem.extras.all()
-        else:
-           orderItem = OrderItem(price = 0, menuItem = MenuItem.objects.get(pk = item['id']), quantity = item['quantity'], size = item['size'])
-           orderItem.save()
-           currentItem['additionals'] = []
-        order.items.add(orderItem)
-        if item['size'] == 'small':
-            total += orderItem.menuItem.small_price * item['quantity']
-            orderItem.price += orderItem.menuItem.small_price
-            orderItem.save()
-        elif item['size'] == 'large':
-            total += orderItem.menuItem.large_price * item['quantity']
-            orderItem.price += orderItem.menuItem.large_price
-            orderItem.save()
-        else:
-            total += orderItem.menuItem.price * item['quantity']
-            orderItem.price += orderItem.menuItem.price
-            orderItem.save()
-        currentItem['name'] = orderItem.menuItem.get_type_display() + ": " + orderItem.menuItem.name
-        currentItem['size'] = orderItem.size
-        currentItem['quantity'] = orderItem.quantity
-        currentItem['price'] = orderItem.price * orderItem.quantity
-        currentItem['id'] = orderItem.id
-        items.append(currentItem)
-    return render(request, "orders/checkout.html", {'items': items, 'total': total})
+    try:
+        order = Order.objects.get(checked_out = False, user = User.objects.get(pk = request.user.id)).items.all()
+        for item in order:
+            total += item.price * item.quantity
+            currentItem = {}
+            if (len(item.toppings.all()) != 0):
+                currentItem['additionals'] = item.toppings.all()
+            elif (len(item.extras.all()) != 0):
+                currentItem['additionals'] = item.extras.all()
+            else:
+                currentItem['additionals'] = []
+            currentItem['name'] = item.menuItem.get_type_display() + ": " + item.menuItem.name
+            currentItem['size'] = item.size
+            currentItem['quantity'] = item.quantity
+            currentItem['price'] = item.price * item.quantity
+            currentItem['id'] = item.id
+            items.append(currentItem)
+        if total == 0:
+            return HttpResponseRedirect(reverse('index'))
+        return render(request, "orders/checkout.html", {'items': items, 'total': total})
+    except:
+        return HttpResponseRedirect(reverse('index'))
 
 def modal_form(request):
     if request.method == "POST":
@@ -152,6 +129,12 @@ def modal_form(request):
         ctx = {'name': name, 'form': form, 'id': id}
         return render(request, 'orders/modalForm.html', context = ctx)
 
+def delete_item(request):
+    item_id = request.POST.get('id')
+    order = Order.objects.get(user = User.objects.get(pk=request.user.id), checked_out = False)
+    order.items.get(id = int(item_id)).delete()
+    return JsonResponse({'success': True, 'item_id': item_id}) 
+
 def add_item(request):
     if request.POST.get('form_type') == 'pizzaForm':
         form = PizzaModal(request.POST or None)
@@ -160,8 +143,71 @@ def add_item(request):
     else:
         form = Modal(request.POST or None)
     if form.is_valid():
-        return JsonResponse({'success': True, 'valid_form': json.dumps(form.cleaned_data)}) 
+        if (Order.objects.filter(user = User.objects.get(pk=request.user.id), checked_out = False)):
+            order = Order.objects.filter(user = User.objects.get(pk=request.user.id), checked_out = False)[0]
+        else:
+            order = Order(user = User.objects.get(pk = request.user.id))
+            order.save()
+        item = form.cleaned_data
+        if 'toppings' in item:
+            orderItem = OrderItem(price = 0, menuItem = MenuItem.objects.get(pk = item['id']), quantity = item['quantity'], size = item['size'])
+            orderItem.save()
+            for topping in item['toppings']:
+                orderItem.toppings.add(Topping.objects.get(pk = int(topping)))
+        elif 'extras' in item:
+            orderItem = OrderItem(price = 0, menuItem = MenuItem.objects.get(pk = item['id']), quantity = item['quantity'], size = item['size'])
+            orderItem.save()
+            for extra in item['extras']:
+                orderItem.extras.add(Extra.objects.get(pk = int(extra)))
+                orderItem.price += .50
+        else:
+            orderItem = OrderItem(price = 0, menuItem = MenuItem.objects.get(pk = item['id']), quantity = item['quantity'], size = item['size'])
+            orderItem.save()
+        order.items.add(orderItem)
+        if item['size'] == 'small':
+            orderItem.price += orderItem.menuItem.small_price
+            orderItem.save()
+        elif item['size'] == 'large':
+            orderItem.price += orderItem.menuItem.large_price
+            orderItem.save()
+        else:
+            orderItem.price += orderItem.menuItem.price
+            orderItem.save()
+        return JsonResponse({'success': True}) 
     ctx = {}
     ctx.update(csrf(request))
     form_html = render_crispy_form(form, context = ctx)
     return JsonResponse({'success': False, 'form_html': form_html})
+
+def place_order(request):
+    order = Order.objects.get(user = User.objects.get(pk=request.user.id), checked_out = False)
+    order.checked_out = True
+    order.save()
+    return JsonResponse({'success': True}) 
+
+@user_passes_test(lambda u: u.is_superuser)
+def admin_order_view(request):
+    orderObjects = Orders.objects.filter(checked_out = True, completed = False)
+    orders = []
+    for order in orderObjects:
+        total = 0
+        items = []
+        for item in order:
+            total += item.price * item.quantity
+            currentItem = {}
+            if (len(item.toppings.all()) != 0):
+                currentItem['additionals'] = item.toppings.all()
+            elif (len(item.extras.all()) != 0):
+                currentItem['additionals'] = item.extras.all()
+            else:
+                currentItem['additionals'] = []
+            currentItem['name'] = item.menuItem.get_type_display() + ": " + item.menuItem.name
+            currentItem['size'] = item.size
+            currentItem['quantity'] = item.quantity
+            currentItem['price'] = item.price * item.quantity
+            currentItem['id'] = item.id
+            items.append(currentItem)
+        orders.append({'items': items, 'total': total})
+    return render(request, "orders/admin.html", {'orders': orders})
+
+

@@ -4,18 +4,13 @@
 
 {% block navbar %}
 
-<div class="collapse navbar-collapse" id="logout">
+<div class="collapse navbar-collapse" id="navbar">
 		<ul class="navbar-nav mr-auto">
 				<li class="nav-item">
 						<a class="nav-link" href="{% url 'logout' %}">Logout<span class="sr-only">(current)</span></a>
 				</li>
 				<li class="nav-item">
-						<form action="{% url 'checkout' %}" method = "post">
-								{% csrf_token %}
-								<input type="hidden" name = "cart" id = 'cart_input'>
-								<input type="hidden" name = "cart_length" id = 'cart_length_input'>
-								<button type = "submit" class="btn btn-link nav-link" id = "shopping_cart" href="">Shopping Cart <span class="badge badge-secondary">0</span></button>
-						</form>
+						<a class="nav-link" id = "shopping_cart" href="{% url 'checkout' %}">Shopping Cart <span class="badge badge-secondary">{{order_length}}</span></button></a>
 				</li>
 </div>
 
@@ -23,7 +18,7 @@
 
 {% block body %}
 
-<ul class="list-group list-group-horizontal">
+<ul class="list-group list-group-horizontal mb-3">
 		<li class="list-group-item" data-table = "table1">Salad</li>
 		<li class="list-group-item" data-table = "table2">Dinner Platter</li>
 		<li class="list-group-item" data-table = "table3">Pasta</li>
