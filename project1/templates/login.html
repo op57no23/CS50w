@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+		<head>
+				<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+				<meta charset="UTF-8">
+				<title></title>
+		</head>
+		<body>
+				<div class="container">
+						<div class="row">
+								<div class="col">
+										<h1 class = "mb-5">Welcome To Grant's Book review Site</h1>
+										<h2>Login</h2>
+								</div>
+						</div>
+						<div class="row mb-4">
+								<div class="col">
+										<form action = {{url_for('home')}} method = "post">
+												<div class="row">
+														<div class="col">
+																<label for="InputEmail1">Username</label>
+																<input type="text" name = "username"class="form-control" id="InputEmail1" placeholder="Enter username">
+														</div>
+														<div class="col">
+																<label for="exampleInputPassword1">Password</label>
+																<input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name = "password">
+														</div>
+														<div class="col align-self-end">
+																<button type="submit" class="btn btn-primary">Submit</button>
+														</div>
+												</div>
+										</form>
+								</div>
+						</div>
+						{% if incorrect_password == True %}
+						<div class="row mb-4">
+								<div class="col">
+										<div class="alert alert-primary" role="alert">
+												Incorrect password: please try again. Passwords can't be reset
+										</div>
+
+
+								</div>
+						</div>
+						{% endif %}
+						{% with message = get_flashed_messages()[0] %}
+						{% if message %}
+						<div class="row mb-4">
+								<div class="col">
+										<div class="alert alert-primary" role="alert">
+												{{message}}
+										</div>
+								</div>
+						</div>
+						{% endif %}
+						{% endwith %}
+						{% if succesful_register == True %}
+						<div class="row mb-4">
+								<div class="col">
+										<div class="alert alert-primary" role="alert">
+												Succesful Registration. Please log in.
+										</div>
+								</div>
+						</div>
+						{% endif %}
+						<div class="row">
+								<div class="col">
+										<h2>New User?
+												<a href="{{ url_for('register')}}">Register Here</a>
+
+										</h2>
+
+								</div>
+
+						</div>
+				</div>
+		</body>
+</html>
