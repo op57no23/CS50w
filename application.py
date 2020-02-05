@@ -1,6 +1,7 @@
 import os
 from passlib.hash import pbkdf2_sha256
 import requests
+import pdb
 
 from flask import Flask, session, render_template, request, url_for, redirect, flash, jsonify
 from flask_session import Session
@@ -95,7 +96,11 @@ def search():
 @app.route("/api/<string:isbn>")
 def api(isbn):
     book_info = db.execute("select * from books where isbn = :isbn", {"isbn": isbn}).first()
+    if book_info is None:
+        return '404 error: that isbn is not in the database', 404
+    pdb.set_trace()
     review_count = db.execute("select count(review) from reviews join books on books.id = reviews.book_id where isbn = :isbn", {"isbn": isbn}).first()
+
     average_stars = db.execute("select avg(stars) from reviews join books on books.id = reviews.book_id where isbn = :isbn", {"isbn": isbn}).first()
     return jsonify(title = book_info['title'], author = book_info['author'], year = book_info['year'], isbn = book_info['isbn'], review_count = review_count['count'], average_score = str(average_stars['avg']))
 
