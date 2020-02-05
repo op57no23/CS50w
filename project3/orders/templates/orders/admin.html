@@ -1,0 +1,48 @@
+{% extends "orders/base.html" %}
+
+{% block title %}Orders{% endblock %}
+
+{% block body %}
+{% for order in orders %}
+<div class="row">
+		<table class="table">
+				<caption style="caption-side:top">Order #{{order.id}}</caption>
+				<thead>
+						<tr>
+								<th class = "text-center">Item</th>
+								<th class = "text-center">Size (if applicable)</th>
+								<th class = "text-center">Quantity</th>
+								<th class = "text-center">Toppings or Extras</th>
+								<th class = "text-center">Price</th>
+						</tr>
+				</thead>
+				<tbody>
+						{% for item in order.items %}
+						<tr>
+								<td class = "text-center">{{item.name}}</td>
+								<td class = "text-center">{{item.size|title}}</td>
+								<td class = "text-center">{{item.quantity}}</td>
+								<td class = "text-center">
+										{% for additional in item.additionals %}
+										{{additional.name}}<br>
+										{% endfor %}
+								</td>
+								<td class = "text-center item-price">${{item.price|floatformat:2}}</td>
+						</tr>
+						{% endfor %}
+				</tbody>
+				<tfoot>
+						<tr>
+									<td colspan = 4><button class = 'btn btn-primary' id = {{order.id}}>Mark order complete</button></td>
+								<td class = "text-center" id = 'total'>Total: ${{order.total|floatformat:2}}</td>
+						</tr>
+								</tfoot>
+		</table>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block javascript %}
+{% load static %}
+<script src="{% static 'orders/admin.js' %}"></script>
+{% endblock %}
