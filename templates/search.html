@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+
+{% block title %}Search Results{% endblock %}
+<body>
+
+		{% block body %}
+		<div class="row mb-4">
+
+				{% for book in result %}
+				<div class="col my-4">
+						<ul>
+								<li><a href="{{ url_for('book', isbn = book.isbn)}}">Title: {{book.title}}</a></li>
+								<li>Author: {{book.author}}</li>
+								<li>ISBN: {{book.isbn}}</li>
+								<li>Year: {{book.year}}</li>
+						</ul>
+				</div>
+				{% endfor %}
+		</div>
+		{% endblock %}
+</body>
+</html>
