@@ -1,0 +1,38 @@
+a:hover, a:link, a:visited, th, td {
+  font-family: sans-serif;
+}
+
+h1 {
+  font-family: fantasy;
+  background-color: #ba8749;
+  text-align: center;
+}
+
+table {
+  width: 50%;
+  border-collapse: collapse;
+  margin: 5%;
+  background: #bf3300;
+}
+
+th, td {
+  padding: 15px;
+  border: 1px solid black;
+}
+
+tr:hover {
+  background-color: #ba8749;
+}
+tr:hover ol {
+  font-family: fantasy;
+}
+
+a:link, a:visited {
+  color: #44cc00;
+}
+
+a:hover {
+  color: hotpink;
+}
+
+/*# sourceMappingURL=OdinStyle1.css.map */
