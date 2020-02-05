@@ -11,5 +11,7 @@ urlpatterns = [
     path("modal", views.modal_form, name = 'modal_form'),
     path("additem", views.add_item, name = 'additem'),
     path('delete', views.delete_item, name = 'delete'),
-    path('place_order', views.place_order, name = 'place_order')
+    path('place_order', views.place_order, name = 'place_order'),
+    path('orders', views.admin_order_view, name = 'orders'),
+    path('mark_complete', views.mark_complete, name = 'mark_complete')
 ]

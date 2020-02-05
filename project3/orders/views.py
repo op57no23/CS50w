@@ -187,12 +187,12 @@ def place_order(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_order_view(request):
-    orderObjects = Orders.objects.filter(checked_out = True, completed = False)
+    orderObjects = Order.objects.filter(checked_out = True, completed = False).all()
     orders = []
     for order in orderObjects:
         total = 0
         items = []
-        for item in order:
+        for item in order.items.all():
             total += item.price * item.quantity
             currentItem = {}
             if (len(item.toppings.all()) != 0):
@@ -207,7 +207,11 @@ def admin_order_view(request):
             currentItem['price'] = item.price * item.quantity
             currentItem['id'] = item.id
             items.append(currentItem)
-        orders.append({'items': items, 'total': total})
+        orders.append({'items': items, 'total': total, 'id': order.id})
     return render(request, "orders/admin.html", {'orders': orders})
 
-
+def mark_complete(request):
+    order = Order.objects.get(pk = int(request.POST.get('id')))
+    order.completed = True
+    order.save()
+    return JsonResponse({'success': True, 'id': int(request.POST.get('id'))})
