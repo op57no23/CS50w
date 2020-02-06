@@ -1,6 +1,6 @@
-# Project 1
+# Project 1 -- https://bookcs50w.herokuapp.com/
 
-This site provides users the ability to search a database of books and to leave reviews for them. It retrieves information from the GoodReads API and has it's own api route. The contents of each file are detailed below: 
+This site provides users the ability to search a database of books and to leave reviews for them. It retrieves information from the GoodReads API and has it's own api route. Register a fake account and login to test functionality. The contents of each file are detailed below: 
 
 ## Templates
 
