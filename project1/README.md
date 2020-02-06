@@ -1,8 +1,4 @@
-# CS50w
-=======
 # Project 1
-
-Web Programming with Python and JavaScript
 
 This site provides users the ability to search a database of books and to leave reviews for them. It retrieves information from the GoodReads API and has it's own api route. The contents of each file are detailed below: 
 
