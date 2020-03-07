@@ -29,6 +29,6 @@ A flask app which allows users to search a database of books and to leave review
 
 A chatroom flask app emulating Slack. Users can create and join channels and send and receive messages in real time. SocketIO used to broadcast messages and channels to all users. Adds an emoji selector from a javascript library. Doesn't work on mobile because of click event handling.
 
-### Project 3 -- [Demonstration](https://youtu.be/p_M1BPoEJwkjl) 
+### Project 3 -- [Video Demonstration](https://youtu.be/p_M1BPoEJwkjl) 
 
 A django app that implements an online store for a imaginary pizza restaurant. Customers can add items to their shopping cart and checkout with their order. The website admin can alter the menu, see orders come in, and check off completed orders. Uses django ORM database and django''s form models and verification. 
